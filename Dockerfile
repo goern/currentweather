@@ -28,6 +28,9 @@ ADD package.json /app/
 RUN npm install
 
 # install app
+RUN mkdir -p /app/routes
 ADD server.js /app/
+ADD consts.js /app/
+ADD routes/ /app/routes/
 
 ENTRYPOINT ["node", "server.js"]
