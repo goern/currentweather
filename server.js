@@ -9,9 +9,13 @@ var http = require("http"),
 
 var redisAddress = "redis", // This is service discovery by DNS, and the name
   redisPort = 6379,         // is set by using REDIS_SERVICE_NAME while
+  redisVersion = '',        // redis version as told by server when connection is ready
   httpAddress = "0.0.0.0",  // doing `oc new-app` or via `docker --link`
   httpPort = "1337",        // or ...
   openWeatherMapApiKey = process.env.OPENWEATHERMAP_APIKEY;
+
+// These are the API versions known by now
+var VERSIONS = {'Testing v1': 'v1beta1'};
 
 if (openWeatherMapApiKey == "" ) {
   winston.error("Missing mandatory env OPENWEATHERMAP_APIKEY");
@@ -24,7 +28,25 @@ redis_client.on("error", function (err) {
   winston.error(err);
 });
 
+redis_client.on("ready", function (time, args, raw_reply) {
+  winston.info("redis is ready");
+  winston.debug(redis_client.server_info);
+
+  redisVersion = redis_client.server_info.redis_version;
+});
+
 app.use(cors());
+
+// route to display versions
+app.get('/', function(req, res) {
+    res.json(VERSIONS);
+})
+
+// versioned routes go in the routes/ directory
+// import the routes
+for (var k in VERSIONS) {
+    app.use(VERSIONS[k], require('./routes' + VERSIONS[k]));
+}
 
 app.get('/status/:q', cors(), function (req, res, next) {
   var query = req.params.q
@@ -71,11 +93,13 @@ app.get('/status/:q', cors(), function (req, res, next) {
 app.get('/healthz', cors(), function (req, res, next) {
   var healthzObject = {}
 
-  healthzObject.currentweather_api_version = 'v1';
-  healthzObject.redis_version = redis_client.server_info.redis_version;
-
-  // TODO if redis_client is not ready, we should not return 200
-  res.json(healthzObject);
+  if (redisVersion != '') {
+    healthzObject.currentweather_api_version = 'v1';
+    healthzObject.redis_version = redisVersion;
+    res.json(healthzObject);
+  } else {
+    res.status(503).json({status: 'not ready'})
+  }
 })
 
 app.listen(httpPort, function () {

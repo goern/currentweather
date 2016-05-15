@@ -19,6 +19,9 @@ Implementing the currentweather API [express](http://expressjs.com/) is used, it
 of functions common to webservices, for example: session handling, CORS handling
 and routing.
 
+The API versioning approach used is described by [Jamund](http://j-query.blogspot.de/2013/01/versioned-apis-with-express.html)
+in more detail.
+
 ## Prerequisites
 
 * Have Kubernetes & Docker running.
