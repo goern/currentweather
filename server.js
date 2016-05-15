@@ -15,7 +15,7 @@ var redisAddress = "redis", // This is service discovery by DNS, and the name
   openWeatherMapApiKey = process.env.OPENWEATHERMAP_APIKEY;
 
 // These are the API versions known by now
-var VERSIONS = {'Testing v1': 'v1beta1'};
+var VERSIONS = {'Testing v1': '/v1beta1'};
 
 if (openWeatherMapApiKey == "" ) {
   winston.error("Missing mandatory env OPENWEATHERMAP_APIKEY");

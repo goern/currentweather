@@ -1,3 +1,8 @@
+var cors = require('cors'),
+  express = require('express');
+
+var app = module.exports = express();
+
 app.get('/weather/:q', cors(), function (req, res, next) {
   var query = req.params.q
   winston.info(Date.now() + " some client requested weather data for ", query);
