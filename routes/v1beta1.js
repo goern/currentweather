@@ -1,7 +1,12 @@
-var cors = require('cors'),
+var winston = require('winston'),
+  cors = require('cors'),
   express = require('express');
 
 var app = module.exports = express();
+
+app.get('/', cors(), function(req, res, next) {
+  res.json({api: "v1beta1", currentweatherVersion: 'v'+currentweatherVersion})
+})
 
 app.get('/weather/:q', cors(), function (req, res, next) {
   var query = req.params.q

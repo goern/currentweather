@@ -7,11 +7,12 @@ var http = require("http"),
   cors = require('cors'),
   app = express();
 
-var redisAddress = "redis", // This is service discovery by DNS, and the name
-  redisPort = 6379,         // is set by using REDIS_SERVICE_NAME while
-  redisVersion = '',        // redis version as told by server when connection is ready
-  httpAddress = "0.0.0.0",  // doing `oc new-app` or via `docker --link`
-  httpPort = "1337",        // or ...
+var currentweatherVersion = '1.0.0',  // This is Currentweather 1
+  redisAddress = "redis",             // This is service discovery by DNS, and the name
+  redisPort = 6379,                   // is set by using REDIS_SERVICE_NAME while
+  redisVersion = '',                  // redis version as told by server when connection is ready
+  httpAddress = "0.0.0.0",            // doing `oc new-app` or via `docker --link`
+  httpPort = "1337",                  // or ...
   openWeatherMapApiKey = process.env.OPENWEATHERMAP_APIKEY;
 
 // These are the API versions known by now
