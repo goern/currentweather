@@ -308,6 +308,17 @@
         to:
           kind: "Service"
           name: "${BACKEND_SERVICE_NAME}"
+    - kind: "Route"
+      apiVersion: "v1"
+      metadata:
+        name: "route53-syseng-us"
+        labels:
+          app: "currentweather"
+      spec:
+        host: "currentweather.syseng.us"
+        to:
+          kind: "Service"
+          name: "${BACKEND_SERVICE_NAME}"
   parameters:
     -
       name: "APPLICATION_DOMAIN"
@@ -320,7 +331,7 @@
     -
       name: "BACKEND_REPOSITORY_REF"
       description: "BACKEND: Set this to a branch name, tag or other ref of your repository if you are not using the default branch"
-      value: "feature/openshift"
+      value: "develop"
     -
       name: "CONTEXT_DIR"
       description: "BACKEND: Set this to the relative path to your project if it is not in the root of your repository"
@@ -331,7 +342,7 @@
     -
       name: "FRONTEND_SOURCE_REPOSITORY_REF"
       description: "FRONTEND: Set this to a branch name, tag or other ref of your repository if you are not using the default branch"
-      value: "feature/more-ui"
+      value: "develop"
     -
       name: "FRONTEND_CONTEXT_DIR"
       description: "FRONTEND: Set this to the relative path to your project if it is not in the root of your repository"
