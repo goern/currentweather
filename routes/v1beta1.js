@@ -2,6 +2,8 @@ var winston = require('winston'),
   cors = require('cors'),
   express = require('express');
 
+var consts = require('../consts.js');
+
 var app = module.exports = express();
 
 openWeatherMapApiKey = process.env.OPENWEATHERMAP_APIKEY;
@@ -12,7 +14,7 @@ if (openWeatherMapApiKey == "" ) {
 }
 
 app.get('/', cors(), function(req, res, next) {
-  res.json({api: "v1beta1", currentweatherVersion: 'v'+currentweatherVersion})
+  res.json({api: ''+consts.CURRENTWEATHER_API_VERSION, name: ''+consts.APPLICATION_NAME, version: 'v'+consts.CURRENTWEATHER_VERSION})
 })
 
 app.get('/weather/:q', cors(), function (req, res, next) {

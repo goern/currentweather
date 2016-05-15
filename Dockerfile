@@ -29,5 +29,7 @@ RUN npm install
 
 # install app
 ADD server.js /app/
+ADD consts.js /app/
+ADD routes/ /app/
 
 ENTRYPOINT ["node", "server.js"]

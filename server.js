@@ -7,7 +7,9 @@ var http = require("http"),
   cors = require('cors'),
   app = express();
 
-var currentweatherVersion = '1.0.0',  // This is Currentweather 1
+var consts = require('consts.js');
+
+var currentweatherVersion = consts.CURRENTWEATHER_VERSION,  // This is Currentweather 1
   redisAddress = "redis",             // This is service discovery by DNS, and the name
   redisPort = 6379,                   // is set by using REDIS_SERVICE_NAME while
   redisVersion = '',                  // redis version as told by server when connection is ready
@@ -95,7 +97,7 @@ app.get('/healthz', cors(), function (req, res, next) {
   var healthzObject = {}
 
   if (redisVersion != '') {
-    healthzObject.currentweather_api_version = 'v1';
+    healthzObject.currentweather_api_version = 'v0';
     healthzObject.redis_version = redisVersion;
     res.json(healthzObject);
   } else {
