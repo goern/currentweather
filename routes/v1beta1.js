@@ -4,6 +4,13 @@ var winston = require('winston'),
 
 var app = module.exports = express();
 
+openWeatherMapApiKey = process.env.OPENWEATHERMAP_APIKEY;
+
+if (openWeatherMapApiKey == "" ) {
+  winston.error("Missing mandatory env OPENWEATHERMAP_APIKEY");
+  process.exit(1);
+}
+
 app.get('/', cors(), function(req, res, next) {
   res.json({api: "v1beta1", currentweatherVersion: 'v'+currentweatherVersion})
 })
