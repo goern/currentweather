@@ -14,15 +14,27 @@ if (openWeatherMapApiKey == "" ) {
   process.exit(1);
 }
 
+// lets describe the API we offer
 app.get('/', cors(), function(req, res, next) {
-  res.json({api: ''+consts.CURRENTWEATHER_API_VERSION, name: ''+consts.APPLICATION_NAME, version: 'v'+consts.CURRENTWEATHER_VERSION})
+  res.json({groupVersion: 'v1beta1',
+            meta: {
+              name: ''+consts.APPLICATION_NAME,
+              version: 'v'+consts.CURRENTWEATHER_VERSION
+            },
+            resources: [
+              { name: 'weather' }
+            ]
+          });
 })
 
+// Fetch weather information from openweathermap for a given City
 app.get('/weather/:q', cors(), function (req, res, next) {
   var query = req.params.q
   winston.info(Date.now() + " some client requested weather data for ", query);
 
+  // if we have it cached, use that information
   redis_client.get("currentweather-" + query, function (err, weatherObjectString) {
+    // if it is not cached, get it
     if (weatherObjectString == null) {
       winston.info(Date.now() + " Querying live weather data for ", query);
       var url = "http://api.openweathermap.org/data/2.5/weather?q=" + query + "&appid=" + openWeatherMapApiKey;
@@ -46,6 +58,8 @@ app.get('/weather/:q', cors(), function (req, res, next) {
             winston.error("Error during json parse: ", error);
             weatherObject.error = error
           }
+
+          // and cache the information
           redis_client.set("currentweather-" + query, JSON.stringify(weatherObject));
           redis_client.expire("currentweather-" + query, 10);
           res.json(weatherObject);
