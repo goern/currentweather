@@ -1,4 +1,5 @@
-var winston = require('winston'),
+var http = require("http"),
+  winston = require('winston'),
   cors = require('cors'),
   express = require('express');
 
