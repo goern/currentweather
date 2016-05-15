@@ -7,7 +7,7 @@ var http = require("http"),
   cors = require('cors'),
   app = express();
 
-var consts = require('consts.js');
+var consts = require('./consts.js');
 
 var currentweatherVersion = consts.CURRENTWEATHER_VERSION,  // This is Currentweather 1
   redisAddress = "redis",             // This is service discovery by DNS, and the name
