@@ -30,5 +30,5 @@ app.get('/info', cors(), function (req, res, next) {
   infoObject.runtimeEnvironment = process.env.mode;
   infoObject.runtimeVersion = process.versions;
 
-  res.json(weatherObject);
+  res.json(infoObject);
 });
