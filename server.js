@@ -20,7 +20,7 @@ var currentweatherVersion = consts.APPLICATION_VERSION,  // This is Currentweath
 // These are the API versions known by now
 var VERSIONS = {
   'Currentweather API vNext': '/v1beta1',
-  'Currentweather '+consts.APPLICATION_VERSION: '/v1'
+  'Currentweather API v1': '/v1'
 };
 
 if (openWeatherMapApiKey == "" ) {
