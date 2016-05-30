@@ -18,7 +18,10 @@ var currentweatherVersion = consts.CURRENTWEATHER_VERSION,  // This is Currentwe
   openWeatherMapApiKey = process.env.OPENWEATHERMAP_APIKEY;
 
 // These are the API versions known by now
-var VERSIONS = {'Testing v1': '/v1beta1'};
+var VERSIONS = {
+  'Testing v1': '/v1beta1',
+  'Currentweather v1.0.0': '/v1'
+};
 
 if (openWeatherMapApiKey == "" ) {
   winston.error("Missing mandatory env OPENWEATHERMAP_APIKEY");
