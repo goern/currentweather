@@ -206,7 +206,7 @@
                   - containerPort: 1337
                 livenessProbe:
                   httpGet:
-                    path: /healthz
+                    path: /_status/healthz
                     port: 1337
                   initialDelaySeconds: 30
                   timeoutSeconds: 1

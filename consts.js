@@ -1,7 +1,7 @@
 //
 
 exports.APPLICATION_NAME = 'ACME Corp Currentweather';
-exports.APPLIVATION_VERSION = '1.1.0';
+exports.APPLICATION_VERSION = '1.1.0';
 
-exports.CURRENTWEATHER_VERSION = '1.1.0';
-exports.CURRENTWEATHER_API_VERSION = 'v0';
+exports.CURRENTWEATHER_VERSION = '1.1.0'; // deprecated
+exports.CURRENTWEATHER_API_VERSION = 'v0'; // deprecated

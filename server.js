@@ -9,7 +9,7 @@ var http = require("http"),
 
 var consts = require('./consts.js');
 
-var currentweatherVersion = consts.CURRENTWEATHER_VERSION,  // This is Currentweather 1
+var currentweatherVersion = consts.APPLICATION_VERSION,  // This is Currentweather 1.1
   redisAddress = "redis",             // This is service discovery by DNS, and the name
   redisPort = 6379,                   // is set by using REDIS_SERVICE_NAME while
   redisVersion = '',                  // redis version as told by server when connection is ready
@@ -19,8 +19,8 @@ var currentweatherVersion = consts.CURRENTWEATHER_VERSION,  // This is Currentwe
 
 // These are the API versions known by now
 var VERSIONS = {
-  'Testing v1': '/v1beta1',
-  'Currentweather v1.0.0': '/v1'
+  'Currentweather API vNext': '/v1beta1',
+  'Currentweather '+consts.APPLICATION_VERSION: '/v1'
 };
 
 if (openWeatherMapApiKey == "" ) {
@@ -63,7 +63,7 @@ app.get('/status/:q', cors(), function (req, res, next) {
 });
 
 // This is a health check for OpenShift
-app.get('/healthz', cors(), function (req, res, next) {
+app.get('/_status/healthz', cors(), function (req, res, next) {
   var healthzObject = {}
 
   if (redisVersion != '') {

@@ -9,7 +9,7 @@ var app = module.exports = express();
 
 // lets describe the API we offer
 app.get('/', cors(), function(req, res, next) {
-  res.json({groupVersion: 'v1beta1',
+  res.json({groupVersion: 'v1',
             meta: {
               name: ''+consts.APPLICATION_NAME,
               version: 'v'+consts.APPLIVATION_VERSION

@@ -19,7 +19,7 @@ app.get('/', cors(), function(req, res, next) {
   res.json({groupVersion: 'v1beta1',
             meta: {
               name: ''+consts.APPLICATION_NAME,
-              version: 'v'+consts.CURRENTWEATHER_VERSION
+              version: 'v'+consts.APPLICATION_VERSION
             },
             resources: [
               { name: 'weather' }
