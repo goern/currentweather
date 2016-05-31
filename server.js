@@ -9,7 +9,7 @@ var http = require("http"),
 
 var consts = require('./consts.js');
 
-var currentweatherVersion = consts.APPLICATION_VERSION,  // This is Currentweather 1.1
+var currentweatherVersion = consts.APPLICATION_VERSION,  // This is Currentweather 1.2
   redisAddress = "redis",             // This is service discovery by DNS, and the name
   redisPort = 6379,                   // is set by using REDIS_SERVICE_NAME while
   redisVersion = '',                  // redis version as told by server when connection is ready
