@@ -48,6 +48,37 @@
         spec: {}
         status:
           dockerImageRepository: ""
+    - kind: "ImageStream"
+      apiVersion: v1
+      metadata:
+        name: "nodejs"
+      spec:
+        tags:
+        - annotations:
+            description: Build and run NodeJS 6.2.0 applications
+            iconClass: icon-nodejs
+            sampleRepo: https://github.com/openshift/nodejs-ex.git
+            supports: nodejs:6.2.0,nodejs:6.2,nodejs
+            tags: builder,nodejs
+            version: "6.2.0"
+          from:
+            kind: DockerImage
+            name: docker.io/goern/nodejs-620-centos7:6.2.0
+          generation: null
+          importPolicy: {}
+          name: "6.2.0"
+        - annotations:
+            description: Build and run NodeJS applications
+            iconClass: icon-nodejs
+            sampleRepo: https://github.com/openshift/nodejs-ex.git
+            supports: nodejs
+            tags: builder,nodejs
+          from:
+            kind: ImageStreamTag
+            name: "6.2.0"
+          generation: null
+          importPolicy: {}
+          name: latest
     - kind: "ConfigMap"
       apiVersion: "v1"
       metadata:
@@ -206,7 +237,7 @@
                   - containerPort: 1337
                 livenessProbe:
                   httpGet:
-                    path: /healthz
+                    path: /_status/healthz
                     port: 1337
                   initialDelaySeconds: 30
                   timeoutSeconds: 1
@@ -308,6 +339,17 @@
         to:
           kind: "Service"
           name: "${BACKEND_SERVICE_NAME}"
+    - kind: "Route"
+      apiVersion: "v1"
+      metadata:
+        name: "route53-syseng-us"
+        labels:
+          app: "currentweather"
+      spec:
+        host: "currentweather.syseng.us"
+        to:
+          kind: "Service"
+          name: "${BACKEND_SERVICE_NAME}"
   parameters:
     -
       name: "APPLICATION_DOMAIN"
@@ -320,7 +362,7 @@
     -
       name: "BACKEND_REPOSITORY_REF"
       description: "BACKEND: Set this to a branch name, tag or other ref of your repository if you are not using the default branch"
-      value: "feature/openshift"
+      value: "develop"
     -
       name: "CONTEXT_DIR"
       description: "BACKEND: Set this to the relative path to your project if it is not in the root of your repository"
@@ -331,7 +373,7 @@
     -
       name: "FRONTEND_SOURCE_REPOSITORY_REF"
       description: "FRONTEND: Set this to a branch name, tag or other ref of your repository if you are not using the default branch"
-      value: "feature/more-ui"
+      value: "develop"
     -
       name: "FRONTEND_CONTEXT_DIR"
       description: "FRONTEND: Set this to the relative path to your project if it is not in the root of your repository"

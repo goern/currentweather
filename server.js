@@ -1,87 +1,87 @@
 /* global server */
 /* global client */
-var http = require("http");
-var redis = require("redis");
-var url = require("url");
+var http = require("http"),
+  winston = require('winston'),
+  redis = require("redis"),
+  express = require('express'),
+  cors = require('cors'),
+  app = express();
 
-var redisAddress = "redis", // This is service discovery by DNS, and the name
-  redisPort = 6379,         // is set by using REDIS_SERVICE_NAME while
-  httpAddress = "0.0.0.0",  // doing `oc new-app` or via `docker --link`
-  httpPort = "1337",        // or ...
+var consts = require('./consts.js');
+
+var currentweatherVersion = consts.APPLICATION_VERSION,  // This is Currentweather 1.2
+  redisAddress = "redis",             // This is service discovery by DNS, and the name
+  redisPort = 6379,                   // is set by using REDIS_SERVICE_NAME while
+  redisVersion = '',                  // redis version as told by server when connection is ready
+  httpAddress = "0.0.0.0",            // doing `oc new-app` or via `docker --link`
+  httpPort = "1337",                  // or ...
   openWeatherMapApiKey = process.env.OPENWEATHERMAP_APIKEY;
 
+// These are the API versions known by now
+var VERSIONS = {
+  'Currentweather API vNext': '/v1beta1',
+  'Currentweather API v1': '/v1'
+};
+
 if (openWeatherMapApiKey == "" ) {
-  console.log("Missing mandatory env OPENWEATHERMAP_APIKEY");
+  winston.error("Missing mandatory env OPENWEATHERMAP_APIKEY");
   process.exit(1);
 }
 
-client = redis.createClient(redisPort, redisAddress);
-client.on("error", function (err) {
-  console.log("Catching error from Redis client to enable reconnect.");
-  console.log(err);
+redis_client = redis.createClient(redisPort, redisAddress);
+redis_client.on("error", function (err) {
+  winston.warn("Catching error from Redis client to enable reconnect.");
+  winston.error(err);
 });
 
-server = http.createServer(function (request, response) {
-  uurl = request.url.match(/^\/status\/(.+)/)
-  var query
-  if(uurl != null && uurl[1] != null) {
-    query = uurl[1]
-  } else {
-    console.log("Didn't find query for request ", request.url)
-    response.writeHead(404);
-    response.end("Wrong query try /status/Bonn,DE");
-  }
+redis_client.on("ready", function (time, args, raw_reply) {
+  winston.info("redis is ready");
+  winston.debug(redis_client.server_info);
 
-  client.get("currentweather-" + query, function (err, weatherObjectString) {
-    if (weatherObjectString == null) {
-      console.log(Date.now() + " Querying live weather data for ", query);
-      var url = "http://api.openweathermap.org/data/2.5/weather?q=" + query + "&appid=" + openWeatherMapApiKey;
-      http.get(url, function(apiResponse) {
-        var body = "";
-        apiResponse.on("data", function(chunk) {
-          body += chunk;
-        });
-        apiResponse.on("end", function() {
-          var weatherObject = {}
-          weatherObject.location = query
-          try {
-            var weather = JSON.parse(body);
-            weatherObject.description = weather.weather[0].description;
-            weatherObject.temperature = Math.round(weather.main.temp - 273);
-            weatherObject.wind = Math.round(weather.wind.speed * 3.6);
-          } catch (error) {
-            console.log("Error during json parse: ", error);
-            weatherObject.error = error
-          }
-          client.set("currentweather-" + query, JSON.stringify(weatherObject));
-          client.expire("currentweather-" + query, 10);
-          writeResponse(response, JSON.stringify(weatherObject));
-        });
-      }).on("error", function(e) {
-        console.log("Got error: ", e);
-      });
-    } else {
-      console.log("Using cached weather data", weatherObjectString);
-      writeResponse(response, weatherObjectString);
-    }
-  });
+  redisVersion = redis_client.server_info.redis_version;
+});
+
+app.use(cors());
+
+// route to display versions
+app.get('/', function(req, res) {
+    res.json(VERSIONS);
 })
 
-server.listen(httpPort, httpAddress);
-
-process.on('SIGTERM', function () {
-  console.log("Received SIGTERM. Exiting.")
-  server.close(function () {
-    process.exit(0);
-  });
-});
-
-function writeResponse(res, weather) {
-  res.writeHead(200, {"Content-Type": "application/json",
-                      "Access-Control-Allow-Origin": "*",
-                      "Access-Control-Allow-Headers": "Content-Type",
-                      'Access-Control-Allow-Methods': 'GET,PUT,POST,DELETE'});
-  res.end(weather);
+// versioned routes go in the routes/ directory
+// import the routes
+for (var k in VERSIONS) {
+    app.use(VERSIONS[k], require('./routes' + VERSIONS[k]));
 }
 
-console.log("Server running at 0.0.0.0:" + httpPort + "/");
+// This is to be deprecated in v1 API
+app.get('/status/:q', cors(), function (req, res, next) {
+  var query = req.params.q
+
+  winston.info("redirecting from /status to /v1beta1/weather");
+  res.redirect('/v1beta1/weather/' + query);
+});
+
+// This is a health check for OpenShift
+app.get('/_status/healthz', cors(), function (req, res, next) {
+  var healthzObject = {}
+
+  if (redisVersion != '') {
+    healthzObject.currentweather_api_version = 'v0';
+    healthzObject.redis_version = redisVersion;
+    res.json(healthzObject);
+  } else {
+    res.status(503).json({status: 'not ready'})
+  }
+})
+
+app.listen(httpPort, function () {
+  winston.info("Server running at 0.0.0.0:" + httpPort + "/");
+});
+
+process.on('SIGTERM', function () {
+  winston.info("Received SIGTERM. Exiting.")
+
+  app.close();
+  process.exit(0);
+});
