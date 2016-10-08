@@ -71,6 +71,7 @@ app.get('/_status/healthz', cors(), function (req, res, next) {
     healthzObject.currentweather_api_version = 'v0';
     healthzObject.redis_version = redisVersion;
     healthzObject.backendHostname = process.env.HOSTNAME;
+    healthzObject.backendApplicationVersion = consts.APPLICATION_VERSION;
 
     res.json(healthzObject);
   } else {

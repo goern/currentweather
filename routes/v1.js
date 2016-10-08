@@ -29,6 +29,7 @@ app.get('/info', cors(), function (req, res, next) {
   infoObject.applicationVersion = consts.APPLIVATION_VERSION;
   infoObject.runtimeEnvironment = process.env.mode;
   infoObject.runtimeVersion = process.versions;
+  infoObject.backendHostname = process.env.HOSTNAME;
 
   res.json(infoObject);
 });
